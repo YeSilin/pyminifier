@@ -68,7 +68,7 @@ something is broken.
 # Import built-in modules
 import os, sys, re, io
 from optparse import OptionParser
-from collections import Iterable
+from collections.abc import Iterable
 
 # Import our own modules
 from . import minification
@@ -222,7 +222,7 @@ def pyminify(options, files):
             # Get the module name from the path
             module = os.path.split(sourcefile)[1]
             module = ".".join(module.split('.')[:-1])
-            source = open(sourcefile).read()
+            source = open(sourcefile, encoding='utf-8').read()
             tokens = token_utils.listified_tokenizer(source)
             if not options.nominify: # Perform minification
                 source = minification.minify(tokens, options)
@@ -276,7 +276,7 @@ def pyminify(options, files):
         module = os.path.split(_file)[1]
         module = ".".join(module.split('.')[:-1])
         filesize = os.path.getsize(_file)
-        source = open(_file).read()
+        source = open(_file, encoding='utf-8').read()
         # Convert the tokens from a tuple of tuples to a list of lists so we can
         # update in-place.
         tokens = token_utils.listified_tokenizer(source)

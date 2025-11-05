@@ -691,6 +691,8 @@ def obfuscate(module, tokens, options, name_generator=None, table=None):
             tokens, obfuscatable_class)
         functions = find_obfuscatables(
             tokens, obfuscatable_function)
+        # 跳过 onMayaDroppedPythonFile
+        functions = [f for f in functions if f != "onMayaDroppedPythonFile"]
         for variable in variables:
             replace_obfuscatables(
                 module,
