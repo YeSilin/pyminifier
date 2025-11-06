@@ -655,7 +655,8 @@ def obfuscate_global_import_methods(module, tokens, name_generator, table=None):
                     index += 6 # To make up for the six tokens we inserted
             index += 1
 
-def obfuscate(module, tokens, options, name_generator=None, table=None):
+# TODO 添加了对 --preserve 参数的支持
+def obfuscate(module, tokens, options, name_generator=None, table=None, preserve=None):
     """
     Obfuscates *tokens* in-place.  *options* is expected to be the options
     variable passed through from pyminifier.py.
@@ -669,6 +670,7 @@ def obfuscate(module, tokens, options, name_generator=None, table=None):
     will be used to perform lookups of replacements and any new replacements
     will be added to it.
     """
+    preserve = set(preserve or [])
     # Need a universal instance of our generator to avoid duplicates
     identifier_length = int(options.replacement_length)
     ignore_length = False
@@ -687,11 +689,14 @@ def obfuscate(module, tokens, options, name_generator=None, table=None):
     if options.obfuscate:
         variables = find_obfuscatables(
             tokens, obfuscatable_variable, ignore_length=ignore_length)
+        variables = [v for v in variables if v not in preserve]
         classes = find_obfuscatables(
             tokens, obfuscatable_class)
+        classes = [c for c in classes if c not in preserve]
         functions = find_obfuscatables(
             tokens, obfuscatable_function)
-        # 跳过 onMayaDroppedPythonFile
+        functions = [f for f in functions if f not in preserve]
+        # 兼容 Maya 跳过 onMayaDroppedPythonFile
         functions = [f for f in functions if f != "onMayaDroppedPythonFile"]
         for variable in variables:
             replace_obfuscatables(
@@ -720,6 +725,7 @@ def obfuscate(module, tokens, options, name_generator=None, table=None):
         if options.obf_classes:
             classes = find_obfuscatables(
                 tokens, obfuscatable_class)
+            classes = [c for c in classes if c not in preserve]
             for _class in classes:
                 replace_obfuscatables(
                     module,
@@ -732,6 +738,7 @@ def obfuscate(module, tokens, options, name_generator=None, table=None):
         if options.obf_functions:
             functions = find_obfuscatables(
                 tokens, obfuscatable_function)
+            functions = [f for f in functions if f not in preserve]
             for function in functions:
                 replace_obfuscatables(
                     module,
@@ -744,6 +751,7 @@ def obfuscate(module, tokens, options, name_generator=None, table=None):
         if options.obf_variables:
             variables = find_obfuscatables(
                 tokens, obfuscatable_variable)
+            variables = [v for v in variables if v not in preserve]
             for variable in variables:
                 replace_obfuscatables(
                     module,

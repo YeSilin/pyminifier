@@ -164,6 +164,13 @@ def main():
         ),
         metavar="<file path>"
     )
+    parser.add_option(
+        "--preserve",
+        dest="preserve",
+        default="",
+        help="Comma-separated list of names (functions, variables, classes) to preserve from obfuscation."
+    )
+
     options, files = parser.parse_args()
     if not files:
         parser.print_help()

@@ -228,6 +228,8 @@ def pyminify(options, files):
                 source = minification.minify(tokens, options)
             # Have to re-tokenize for obfucation (it is quick):
             tokens = token_utils.listified_tokenizer(source)
+            # TODO 添加了对 preserve 参数的支持
+            preserve_list = [name.strip() for name in options.preserve.split(',')] if options.preserve else []
             # Perform obfuscation if any of the related options were set
             if name_generator:
                 obfuscate.obfuscate(
@@ -235,7 +237,8 @@ def pyminify(options, files):
                     tokens,
                     options,
                     name_generator=name_generator,
-                    table=table
+                    table=table,
+                    preserve=preserve_list
                 )
             # Convert back to text
             result = ''
@@ -280,6 +283,8 @@ def pyminify(options, files):
         # Convert the tokens from a tuple of tuples to a list of lists so we can
         # update in-place.
         tokens = token_utils.listified_tokenizer(source)
+        # TODO 单文件支持 --preserve 参数
+        preserve_list = [name.strip() for name in options.preserve.split(',')] if options.preserve else []
         if not options.nominify: # Perform minification
             source = minification.minify(tokens, options)
             # Convert back to tokens in case we're obfuscating
@@ -291,7 +296,7 @@ def pyminify(options, files):
             identifier_length = int(options.replacement_length)
             name_generator = obfuscate.obfuscation_machine(
                 identifier_length=identifier_length)
-            obfuscate.obfuscate(module, tokens, options)
+            obfuscate.obfuscate(module, tokens, options, preserve=preserve_list)
         # Convert back to text
         result = ''
         if prepend:
